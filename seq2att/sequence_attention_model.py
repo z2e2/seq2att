@@ -118,7 +118,7 @@ def sequence_attention_model(opt):
     # additional fully connected
     r_emb = fully_connected(r_emb, opt.fc_n_layer, opt.fc_n_node, opt.drop_out_rate, block_name = 'fc')
     
-    if opt.Ty == 2:
+    if opt.Ty <= 2:
         out = Dense(1, activation='sigmoid', name='final_dense')(r_emb)
         model = Model(inputs = X, outputs = out)
         # Compile model

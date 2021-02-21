@@ -34,6 +34,15 @@ def main():
     visualize_parser.add_argument("-m", metavar="metadata",
                         help="metadata used to build training and testing datasets",
                         required=True, type=str)
+    train_parser.add_argument("-taxa", metavar="taxonomic labels",
+                        help="path to the taxonomic labels of the visualization dataset used to color code different reads by their taxonomic labels",
+                        required=True, type=str)
+    train_parser.add_argument("-data", metavar="visualization dataset",
+                        help="path to visualization dataset the user seleced for visualization and model interpretation",
+                        required=True, type=str)
+    visualize_parser.add_argument("-nanme", metavar="taxon name to be visualized",
+                        help="a certain taxon that the user wants to visualize for attention weights interpretation",
+                        required=True, type=str)
     # default
     visualize_parser = subparsers.add_parser("default")
     visualize_parser.add_argument("-m", metavar="metadata",
@@ -49,6 +58,7 @@ def main():
             setattr(opt, key, config_dict[key])
         ## LOAD METADATA
         preprocess_data_pickle(opt)
+        logging.info('Program completed and preprocessed data were saved to {}'.format(opt.out_dir))
     elif args.subparser_name == "train":
         metadata = args.m
         ## LOAD METADATA
@@ -67,21 +77,27 @@ def main():
                                    dim=(opt.SEQLEN,opt.BASENUM), batch_size=opt.batch_size, shuffle=opt.shuffle)
         seq_att_model.train_generator(training_generator, n_workers=opt.n_workers)
         seq_att_model.evaluate_generator(testing_generator, n_workers=opt.n_workers)
-        
+        logging.info('Program completed and model was saved to {}'.format(opt.save_model_path))
     elif args.subparser_name == "visualize":
         metadata = args.m
+        visualdata = args.data
+        taxadata = args.taxa
+        taxaname = args.name
+        X_visual, y_visual = pickle.load(open(visualdata, 'rb'))
+        taxa_label_list = pickle.load(open(taxadata, 'rb'))
         ## LOAD METADATA
         opt = Config()
         config_dict = yaml.safe_load(open(metadata))
         for key in config_dict:
             setattr(opt, key, config_dict[key])
         ## LOAD METADATA
+        label_dict = pickle.load(open('{}/label_dict.pkl'.format(opt.out_dir), 'rb'))
         prediction, attention_weights, sequence_embedding = seq_att_model.extract_weigths(X_visual)
         idx_to_label = {label_dict[label]: label for label in label_dict}
         seq_visual_unit = SeqVisualUnit(X_visual, y_visual, idx_to_label, taxa_label_list, 
                                         prediction, attention_weights, sequence_embedding, 'Figures')
         seq_visual_unit.plot_embedding()
-        seq_visual_unit.plot_attention('Prevotella')
+        seq_visual_unit.plot_attention(taxa_name)
         
     elif args.subparser_name == "default":
         metadata = args.m
@@ -102,13 +118,7 @@ def main():
                                    dim=(opt.SEQLEN,opt.BASENUM), batch_size=opt.batch_size, shuffle=opt.shuffle)
         seq_att_model.train_generator(training_generator, n_workers=opt.n_workers)
         seq_att_model.evaluate_generator(testing_generator, n_workers=opt.n_workers)
-        prediction, attention_weights, sequence_embedding = seq_att_model.extract_weigths(X_visual)
-        idx_to_label = {label_dict[label]: label for label in label_dict}
-        seq_visual_unit = SeqVisualUnit(X_visual, y_visual, idx_to_label, taxa_label_list, 
-                                        prediction, attention_weights, sequence_embedding, 'Figures')
-        seq_visual_unit.plot_embedding()
-        seq_visual_unit.plot_attention('Prevotella')
-        
+        logging.info('Program completed and model was saved to {}'.format(opt.save_model_path))
     
     
 if __name__ == "__main__":
