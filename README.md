@@ -7,8 +7,13 @@ Owner: Gail Rosen, gailr at ece dot drexel dot edu
 
 Conda installation:
 ```
+## If you don't have compatible GPUs for training (CPU only) 
 conda create -n seq2att python=3.5.4 biopython=1.71 pandas=0.20.3 matplotlib=2.1.1 scipy=1.0.0 scikit-learn=0.19.1 tensorflow=1.9.0 keras=2.2.2
 source activate seq2att
+# If you want to use GPUs to accelerate your training process
+conda create -n seq2att python=3.5.4 biopython=1.71 pandas=0.20.3 matplotlib=2.1.1 scipy=1.0.0 scikit-learn=0.19.1 tensorflow-gpu=1.9.0 keras-gpu=2.2.2
+source activate seq2att
+
 git clone https://github.com/z2e2/seq2att.git
 cd seq2att
 python setup.py install

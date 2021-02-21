@@ -3,13 +3,12 @@ import logging
 import keras
 import pickle
 import numpy as np
-
+import yaml
 from .SeqAttModel import SeqAttModel
 from .SeqVisualUnit import SeqVisualUnit
 from .utils import preprocess_data, preprocess_data_pickle
 from .DataGenerator import DataGenerator, DataGeneratorUnlabeled, DataGeneratorPickle, DataGeneratorUnlabeledPickle
-
-from config import Config
+from .config import Config
 
 logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.INFO)
 
@@ -43,15 +42,21 @@ def main():
     args = parser.parse_args()
     if args.subparser_name == "build":
         metadata = args.m
-        ## TO BE DEVELOPED
+        ## LOAD METADATA
         opt = Config()
-        ## TO BE DEVELOPED
+        config_dict = yaml.safe_load(open(metadata))
+        for key in config_dict:
+            setattr(opt, key, config_dict[key])
+        ## LOAD METADATA
         preprocess_data_pickle(opt)
     elif args.subparser_name == "train":
         metadata = args.m
-        ## TO BE DEVELOPED
+        ## LOAD METADATA
         opt = Config()
-        ## TO BE DEVELOPED
+        config_dict = yaml.safe_load(open(metadata))
+        for key in config_dict:
+            setattr(opt, key, config_dict[key])
+        ## LOAD METADATA
         label_dict = pickle.load(open('{}/label_dict.pkl'.format(opt.out_dir), 'rb')) 
         sample_to_label, read_meta_data = pickle.load(open('{}/meta_data.pkl'.format(opt.out_dir), 'rb'))
         partition = pickle.load(open('{}/train_test_split.pkl'.format(opt.out_dir), 'rb')) 
@@ -65,9 +70,12 @@ def main():
         
     elif args.subparser_name == "visualize":
         metadata = args.m
-        ## TO BE DEVELOPED
+        ## LOAD METADATA
         opt = Config()
-        ## TO BE DEVELOPED
+        config_dict = yaml.safe_load(open(metadata))
+        for key in config_dict:
+            setattr(opt, key, config_dict[key])
+        ## LOAD METADATA
         prediction, attention_weights, sequence_embedding = seq_att_model.extract_weigths(X_visual)
         idx_to_label = {label_dict[label]: label for label in label_dict}
         seq_visual_unit = SeqVisualUnit(X_visual, y_visual, idx_to_label, taxa_label_list, 
@@ -77,9 +85,12 @@ def main():
         
     elif args.subparser_name == "default":
         metadata = args.m
-        ## TO BE DEVELOPED
+        ## LOAD METADATA
         opt = Config()
-        ## TO BE DEVELOPED
+        config_dict = yaml.safe_load(open(metadata))
+        for key in config_dict:
+            setattr(opt, key, config_dict[key])
+        ## LOAD METADATA
         preprocess_data_pickle(opt)
         label_dict = pickle.load(open('{}/label_dict.pkl'.format(opt.out_dir), 'rb')) 
         sample_to_label, read_meta_data = pickle.load(open('{}/meta_data.pkl'.format(opt.out_dir), 'rb'))
@@ -91,11 +102,6 @@ def main():
                                    dim=(opt.SEQLEN,opt.BASENUM), batch_size=opt.batch_size, shuffle=opt.shuffle)
         seq_att_model.train_generator(training_generator, n_workers=opt.n_workers)
         seq_att_model.evaluate_generator(testing_generator, n_workers=opt.n_workers)
-        
-        metadata = args.m
-        ## TO BE DEVELOPED
-        opt = Config()
-        ## TO BE DEVELOPED
         prediction, attention_weights, sequence_embedding = seq_att_model.extract_weigths(X_visual)
         idx_to_label = {label_dict[label]: label for label in label_dict}
         seq_visual_unit = SeqVisualUnit(X_visual, y_visual, idx_to_label, taxa_label_list, 
