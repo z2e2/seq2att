@@ -34,18 +34,18 @@ def main():
     visualize_parser.add_argument("-m", metavar="metadata",
                         help="metadata used to build training and testing datasets",
                         required=True, type=str)
-    train_parser.add_argument("-taxa", metavar="taxonomic labels",
+    visualize_parser.add_argument("-taxa", metavar="taxonomic labels",
                         help="path to the taxonomic labels of the visualization dataset used to color code different reads by their taxonomic labels",
                         required=True, type=str)
-    train_parser.add_argument("-data", metavar="visualization dataset",
+    visualize_parser.add_argument("-data", metavar="visualization dataset",
                         help="path to visualization dataset the user seleced for visualization and model interpretation",
                         required=True, type=str)
     visualize_parser.add_argument("-nanme", metavar="taxon name to be visualized",
                         help="a certain taxon that the user wants to visualize for attention weights interpretation",
                         required=True, type=str)
     # default
-    visualize_parser = subparsers.add_parser("default")
-    visualize_parser.add_argument("-m", metavar="metadata",
+    default_parser = subparsers.add_parser("default")
+    default_parser.add_argument("-m", metavar="metadata",
                         help="metadata used to build training and testing datasets",
                         required=True, type=str)
     args = parser.parse_args()
