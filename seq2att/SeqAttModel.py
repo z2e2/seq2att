@@ -27,7 +27,7 @@ class SeqAttModel:
         '''
         Model training
         '''
-        logging.info('Training started: train the model on {} sequences'.format(X.shape[0]))
+        logging.info('Training started: train the model on {} sequences using {}'.format(X.shape[0], self.opt.device))
         self.history = self.model.fit(X, y, batch_size=self.opt.batch_size, epochs=self.opt.epochs, verbose=self.opt.verbose)
         train_loss, train_acc = self.model.evaluate(X, y, batch_size=self.opt.batch_size, verbose=self.opt.verbose)
         logging.info('Training completed: training accuracy is {:.4f}.'.format(train_acc))
@@ -36,7 +36,7 @@ class SeqAttModel:
         '''
         Model training with a generator
         '''
-        logging.info('Training started:')
+        logging.info('Training started using {}:'.format(self.opt.device))
         self.history = self.model.fit_generator(generator=training_generator,
                                                 use_multiprocessing=True,
                                                 workers=n_workers, verbose=True)
