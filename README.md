@@ -73,9 +73,9 @@ seq2att build -m config.yml
 seq2att train -m config.yml
 ```
 
-#### 4. Visualize the read embedding and attention weights
-We recommend you to use our [python package](https://github.com/EESI/sequence_attention/tree/master) to visualize the attention weights because you can have more control over the figure generation. For a quick and dirty visualization in commandline, please use the following command:
+#### 4. Extract the read embedding and attention weights
+We recommend you to use our [python package](https://github.com/EESI/sequence_attention/tree/master) to visualize the attention weights because you can have more control over the figure generation. For a quick attention weights extraction in commandline, please use the following command:
 ```
-seq2att visualize -m config.yml -data datafile -taxa taxadata -name taxaname
+seq2att attention -m config.yml -data datafile -taxa taxadata -name taxaname
 ```
-This command does need the user to prepare additional files. First, `datafile` is a pickle file that contains `X_visual` (N by SEQ_LEN by NUMBASE) in *numpy array* and `y_visual` (phenotypic labels in integers) in *numpy array*,  `taxadata` a list of taxonomic labels of those sequences (e.g., genus level labels). `taxaname` is the name of the taxon of interest.
+This command does need the user to prepare additional files. First, `datafile` is a pickle file that contains `X_visual` (N by SEQ_LEN by NUMBASE) in *numpy array* and `y_visual` (phenotypic labels in integers) in *numpy array*,  `taxadata` a list of taxonomic labels of those sequences (e.g., genus level labels). `taxaname` is the name of the taxon of interest. The attention weights will then be extracted and the users can load them in python for downstream analysis. The output is a pickle file that contains four python objects: `prediction`, `attention_weights`, `sequence_embedding`, `idx_to_label`.   

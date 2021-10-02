@@ -7,8 +7,9 @@ SEQLEN: 100 # sequence length
 BASENUM: 4 # dimension of input sequence (e.g., there are 4 major bases for DNA sequence input, therefore BASENUM is 4)
 Ty: 5 # number of target classes (Ty >= 2)
 save_model_path: 'saved_model/'  # the absolute path to the saved model directory (should be created by the user in advance)
-
-n_workers: 10
+model_name: 'demo_model.h5'
+attention_weights_output: 'att_weights.pkl'
+n_workers: 1
 
 if_cnn: 1 # if_cnn = {0: no cnn, 1: cnn+resnet}
 n_cnn_layer: 1 # number of cnn/resnet blocks                

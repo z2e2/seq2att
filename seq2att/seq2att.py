@@ -17,7 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description='seq2att is a command line interface to train a Read2Pheno model on customized 16S rRNA dataset.', prog='seq2att')
     subparsers = parser.add_subparsers(title='subcommands',
                                        description='the following subcommands \
-                                    are available: build, train, visualize, default', 
+                                    are available: build, train, attention, default', 
                                     dest='subparser_name')
     # build
     build_parser = subparsers.add_parser("build")
@@ -30,7 +30,7 @@ def main():
                         help="metadata used to build training and testing datasets",
                         required=True, type=str)
     # visualize
-    visualize_parser = subparsers.add_parser("visualize")
+    visualize_parser = subparsers.add_parser("attention")
     visualize_parser.add_argument("-m", metavar="metadata",
                         help="metadata used to build training and testing datasets",
                         required=True, type=str)
@@ -77,8 +77,9 @@ def main():
                                    dim=(opt.SEQLEN,opt.BASENUM), batch_size=opt.batch_size, shuffle=opt.shuffle)
         seq_att_model.train_generator(training_generator, n_workers=opt.n_workers)
         seq_att_model.evaluate_generator(testing_generator, n_workers=opt.n_workers)
+        seq_att_model.save('{}/{}'.format(opt.save_model_path, opt.model_name))
         logging.info('Program completed and model was saved to {}'.format(opt.save_model_path))
-    elif args.subparser_name == "visualize":
+    elif args.subparser_name == "attention":
         metadata = args.m
         visualdata = args.data
         taxadata = args.taxa
@@ -90,14 +91,18 @@ def main():
         config_dict = yaml.safe_load(open(metadata))
         for key in config_dict:
             setattr(opt, key, config_dict[key])
-        ## LOAD METADATA
+        ## LOAD Model
+        seq_att_model = SeqAttModel(opt)
+        seq_att_model.load('{}/{}'.format(opt.save_model_path, opt.model_name))
         label_dict = pickle.load(open('{}/label_dict.pkl'.format(opt.out_dir), 'rb'))
         prediction, attention_weights, sequence_embedding = seq_att_model.extract_weigths(X_visual)
         idx_to_label = {label_dict[label]: label for label in label_dict}
-        seq_visual_unit = SeqVisualUnit(X_visual, y_visual, idx_to_label, taxa_label_list, 
-                                        prediction, attention_weights, sequence_embedding, 'Figures')
-        seq_visual_unit.plot_embedding()
-        seq_visual_unit.plot_attention(taxa_name)
+        pickle.dump([prediction, attention_weights, sequence_embedding, idx_to_label], open(opt.attention_weights_output, 'wb'))
+        logging.info('Program completed and attention weights were saved to {}'.format(opt.attention_weights_output))
+#         seq_visual_unit = SeqVisualUnit(X_visual, y_visual, idx_to_label, taxa_label_list, 
+#                                         prediction, attention_weights, sequence_embedding, 'Figures')
+#         seq_visual_unit.plot_embedding()
+#         seq_visual_unit.plot_attention(taxa_name)
         
     elif args.subparser_name == "default":
         metadata = args.m
@@ -118,6 +123,7 @@ def main():
                                    dim=(opt.SEQLEN,opt.BASENUM), batch_size=opt.batch_size, shuffle=opt.shuffle)
         seq_att_model.train_generator(training_generator, n_workers=opt.n_workers)
         seq_att_model.evaluate_generator(testing_generator, n_workers=opt.n_workers)
+        seq_att_model.save(opt.save_model_path)
         logging.info('Program completed and model was saved to {}'.format(opt.save_model_path))
     
     
