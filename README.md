@@ -78,4 +78,10 @@ We recommend you to use our [python package](https://github.com/EESI/sequence_at
 ```
 seq2att attention -m config.yml -data datafile -taxa taxadata -name taxaname
 ```
-This command does need the user to prepare additional files. First, `datafile` is a pickle file that contains `X_visual` (N by SEQ_LEN by NUMBASE) in *numpy array* and `y_visual` (phenotypic labels in integers) in *numpy array*,  `taxadata` a list of taxonomic labels of those sequences (e.g., genus level labels). `taxaname` is the name of the taxon of interest. The attention weights will then be extracted and the users can load them in python for downstream analysis. The output is a pickle file that contains four python objects: `prediction`, `attention_weights`, `sequence_embedding`, `idx_to_label`.   
+This command does need the user to prepare additional files. First, `datafile` is a pickle file that contains `X_visual` (N by SEQ_LEN by NUMBASE) in *numpy array* and `y_visual` (phenotypic labels in integers) in *numpy array*,  `taxadata` a list of taxonomic labels of those sequences (e.g., genus level labels). `taxaname` is the name of the taxon of interest. The attention weights will then be extracted and the users can load them in python for downstream analysis. The output is a pickle file that contains four python objects: `prediction`, `attention_weights`, `sequence_embedding`, `idx_to_label`. To be specific:
+1. `prediction`: the final dense layer output, $N$ by $N_c$.
+2. `attention_weights`: the attention weights, $N$ by $L$ by $1$.
+3. `sequence_embedding`: the sequence level embedding, $N$ by $N_h$.
+4. `idx_to_label`: maps the dense node index to phenotypic labels. 
+where $N$ is the number of sequences of interest, $N_c$ is the number of phenotypic classes, $L$ is the sequence length, and $N_h$ is the number of hidden nodes in the LSTM layer. The users can use the output file together with the datafile, taxafile to make the visualization as demonstrated in the [notebook](https://github.com/EESI/sequence_attention/blob/master/demo.ipynb). 
+
