@@ -40,7 +40,7 @@ def main():
     visualize_parser.add_argument("-data", metavar="visualization dataset",
                         help="path to visualization dataset the user seleced for visualization and model interpretation",
                         required=True, type=str)
-    visualize_parser.add_argument("-nanme", metavar="taxon name to be visualized",
+    visualize_parser.add_argument("-name", metavar="taxon name to be visualized",
                         help="a certain taxon that the user wants to visualize for attention weights interpretation",
                         required=True, type=str)
     # default
